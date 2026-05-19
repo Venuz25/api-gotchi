@@ -12,6 +12,9 @@
     <div class="game-console">
         <header>
             <h1 id="nombre-mascota">Cargando...</h1>
+            <div style="background: #fff; border-radius: 20px; display: inline-block; padding: 5px 15px; margin-top: 10px; font-weight: bold; color: #f39c12; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                💰 <span id="coin-counter">0</span>
+            </div>
         </header>
 
         <div class="screen-border">
@@ -42,10 +45,13 @@
             </div>
         </div>
 
-        <div class="controls" id="control-buttons">
-            <button class="btn-eat" onclick="realizarAccion('alimentar')">Comer</button>
-            <button class="btn-play" onclick="realizarAccion('jugar')">Jugar</button>
-            <button class="btn-sleep" onclick="realizarAccion('dormir')">Dormir</button>
+        </div>
+
+        <div class="controls" id="control-buttons" style="grid-template-columns: repeat(2, 1fr);">
+            <button class="btn-eat" onclick="realizarAccion('comprar/pizza')" style="background-color: #f1c40f; color: #333;">🍕 Pizza (30)</button>
+            <button class="btn-play" onclick="realizarAccion('comprar/cafe')" style="background-color: #e67e22;">☕ Café (15)</button>
+            <button class="btn-eat" onclick="realizarAccion('jugar')" style="background-color: #00b894;">🎮 Jugar (+20)</button>
+            <button class="btn-sleep" onclick="realizarAccion('dormir')">💤 Dormir</button>
         </div>
         
         <button id="btn-revive" class="btn-revive" onclick="realizarAccion('reiniciar')" style="display: none;">✨ Revivir a Pixel ✨</button>

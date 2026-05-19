@@ -5,6 +5,7 @@ const elAvatar = document.getElementById('pet-avatar');
 const elContenedor = document.getElementById('pet-container');
 const elLog = document.getElementById('event-log');
 const elFx = document.getElementById('pet-fx');
+const elMonedas = document.getElementById('coin-counter');
 const roomBg = document.getElementById('room-background');
 
 const barHambre = document.getElementById('bar-hambre');
@@ -46,6 +47,8 @@ async function realizarAccion(accion) {
 // --- 2. ACTUALIZACIÓN VISUAL ---
 function actualizarUI(mascota) {
     elNombre.textContent = mascota.nombre;
+    elMonedas.textContent = mascota.monedas;
+    
     barHambre.value = mascota.hambre;
     barFelicidad.value = mascota.felicidad;
     barEnergia.value = mascota.energia;
