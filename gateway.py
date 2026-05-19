@@ -13,10 +13,6 @@ URLs = {
 }
 
 async def obtener_estado_interno(client: httpx.AsyncClient):
-    """Función helper para unificar la recolección de datos de los microservicios
-
-    y evitar repetir código en cada endpoint.
-    """
     r_vit = await client.get(f"{URLs['vitales']}/vitales")
     r_eco = await client.get(f"{URLs['economia']}/cartera")
     r_logros = await client.get(f"{URLs['logros']}/estadisticas")
@@ -24,11 +20,11 @@ async def obtener_estado_interno(client: httpx.AsyncClient):
     estado = r_vit.json()
     estado["monedas"] = r_eco.json()["monedas"]
     estado["medallas"] = r_logros.json()["medallas"]
+    estado["estadisticas"] = r_logros.json()["estadisticas"]
     return estado
 
 @app.get("/estado")
 async def estado_general():
-    """Agrega datos de Vitales, Economía y Logros para el Frontend."""
     async with httpx.AsyncClient() as client:
         try:
             estado = await obtener_estado_interno(client)
@@ -55,7 +51,6 @@ async def accion_jugar():
             if nuevo_logro:
                 mensaje += f" ¡NUEVO LOGRO DESBLOQUEADO: {nuevo_logro}!"
 
-            # OBTENER ESTADO ACTUALIZADO PARA EL FRONTEND
             estado = await obtener_estado_interno(client)
             return {"mensaje": mensaje, "data": estado}
         except httpx.ConnectError:
@@ -63,7 +58,6 @@ async def accion_jugar():
 
 @app.post("/comprar/{item}")
 async def accion_comprar_y_usar(item: str):
-    """Orquestación compleja: Lee catálogo -> Cobra -> Aplica -> Audita."""
     async with httpx.AsyncClient() as client:
         try:
             # 1. Consultar Inventario para saber precio y efecto
@@ -93,7 +87,6 @@ async def accion_comprar_y_usar(item: str):
         
 @app.post("/dormir")
 async def accion_dormir():
-    """Pixel duerme: Recupera energía y se audita el logro."""
     async with httpx.AsyncClient() as client:
         try:
             # 1. Modificar vitales
@@ -101,11 +94,14 @@ async def accion_dormir():
             if r_vit.status_code != 200: raise HTTPException(status_code=400, detail=r_vit.json().get("detail"))
             
             # 2. Auditar la acción en el microservicio de Logros
-            await client.post(f"{URLs['logros']}/auditar", json={"tipo": "dormir"})
-            
-            # OBTENER ESTADO ACTUALIZADO PARA EL FRONTEND
+            r_logro = await client.post(f"{URLs['logros']}/auditar", json={"tipo": "dormir"})
+
+            mensaje = "Pixel durmió profundamente. Zzz..."
+            nuevo_logro = r_logro.json().get("nuevo_logro")
+            if nuevo_logro: mensaje += f" ¡NUEVO LOGRO: {nuevo_logro}!"
+
             estado = await obtener_estado_interno(client)
-            return {"mensaje": "Pixel durmió profundamente. Zzz...", "data": estado}
+            return {"mensaje": mensaje, "data": estado, "nuevo_logro": nuevo_logro}
         except httpx.ConnectError:
             raise HTTPException(status_code=503, detail="Error de comunicación interna.")
 

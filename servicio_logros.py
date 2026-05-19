@@ -13,7 +13,6 @@ class Accion(BaseModel):
 def registrar_accion(accion: Accion):
     nuevo_logro = None
     
-    # Actualizar contadores
     if accion.tipo == "jugar":
         estadisticas["jugadas"] += 1
         if estadisticas["jugadas"] == 3 and "Gamer Novato 🎮" not in medallas:
@@ -24,6 +23,12 @@ def registrar_accion(accion: Accion):
         estadisticas["comidas"] += 1
         if estadisticas["comidas"] == 3 and "Glotón 🍔" not in medallas:
             nuevo_logro = "Glotón 🍔"
+            medallas.append(nuevo_logro)
+
+    elif accion.tipo == "dormir":
+        estadisticas["dormidas"] += 1
+        if estadisticas["dormidas"] == 3 and "Dormilón 😴" not in medallas:
+            nuevo_logro = "Dormilón 😴"
             medallas.append(nuevo_logro)
 
     return {"estadisticas": estadisticas, "medallas": medallas, "nuevo_logro": nuevo_logro}
